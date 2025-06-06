@@ -69,8 +69,7 @@
       L.tileLayer(
         "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
       ).addTo(map);
-
-      let myLocation = null;
+      
       const realEstates = [
         {
           id: 1,
@@ -127,22 +126,30 @@
         iconSize: [0, 0],
       });
 
+      let myLocationMarker = null;
+
       navigator.geolocation.watchPosition(
         function (position) {
-          const speed = position.coords.speed; // Đơn vị: mét/giây (m/s)
-          const kmh = (speed * 3.6).toFixed(0);
+          const speed = position.coords.speed; // m/s
+          const kmh = speed ? (speed * 3.6).toFixed(0) : 0;
           console.log("≈", kmh, "km/h");
           document.getElementById("speed").innerText = `Tốc độ: ${kmh} km/h`;
 
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
-          myLocation = { lat, lng };
+          const myLocation = { lat, lng };
 
-          map.setView([myLocation.lat, myLocation.lng], 20);
+          // Cập nhật vị trí map
+          map.setView([lat, lng], 20);
 
-          L.marker([myLocation.lat, myLocation.lng], {
-            icon: lottieMarkerIcon,
-          }).addTo(map);
+          // Nếu đã có marker, di chuyển marker đó; nếu chưa có thì tạo mới
+          if (myLocationMarker) {
+            myLocationMarker.setLatLng([lat, lng]);
+          } else {
+            myLocationMarker = L.marker([lat, lng], {
+              icon: lottieMarkerIcon,
+            }).addTo(map);
+          }
         },
         function (error) {
           alert("Không thể lấy vị trí: " + error.message);
