@@ -69,7 +69,7 @@
       L.tileLayer(
         "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
       ).addTo(map);
-      
+
       const realEstates = [
         {
           id: 1,
@@ -130,17 +130,14 @@
 
       navigator.geolocation.watchPosition(
         function (position) {
-          const speed = position.coords.speed; // m/s
-          const kmh = speed ? (speed * 3.6).toFixed(0) : 0;
-          console.log("≈", kmh, "km/h");
-          document.getElementById("speed").innerText = `Tốc độ: ${kmh} km/h`;
-
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
-          const myLocation = { lat, lng };
-
           // Cập nhật vị trí map
           map.setView([lat, lng], 20);
+
+          const speed = position.coords.speed; // m/s
+          const kmh = speed !== null ? (speed * 3.6).toFixed(2) : "--";
+          document.getElementById("speed").innerText = `Tốc độ: ${kmh} km/h`;
 
           // Nếu đã có marker, di chuyển marker đó; nếu chưa có thì tạo mới
           if (myLocationMarker) {
