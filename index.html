@@ -127,7 +127,7 @@
         iconSize: [0, 0],
       });
 
-      navigator.geolocation.getCurrentPosition(
+      navigator.geolocation.watchPosition(
         function (position) {
           const speed = position.coords.speed; // Đơn vị: mét/giây (m/s)
           const kmh = (speed * 3.6).toFixed(0);
@@ -137,7 +137,9 @@
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
           myLocation = { lat, lng };
+
           map.setView([myLocation.lat, myLocation.lng], 20);
+
           L.marker([myLocation.lat, myLocation.lng], {
             icon: lottieMarkerIcon,
           }).addTo(map);
