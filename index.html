@@ -127,19 +127,55 @@
       });
 
       let myLocationMarker = null;
+      let lastLatLng = null;
+      let lastTimestamp = null;
+
+      function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371e3; // Earth radius in meters
+        const toRad = (deg) => (deg * Math.PI) / 180;
+        const dLat = toRad(lat2 - lat1);
+        const dLon = toRad(lon2 - lon1);
+        const a =
+          Math.sin(dLat / 2) ** 2 +
+          Math.cos(toRad(lat1)) *
+            Math.cos(toRad(lat2)) *
+            Math.sin(dLon / 2) ** 2;
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+      }
 
       navigator.geolocation.watchPosition(
         function (position) {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
-          // Cập nhật vị trí map
-          map.setView([lat, lng], 20);
 
-          const speed = position.coords.speed; // m/s
+          // --- TÍNH TỐC ĐỘ ---
+          let speed = position.coords.speed; // m/s (có thể null)
+          const now = Date.now();
+
+          if (speed === null && lastLatLng && lastTimestamp) {
+            const distance = calculateDistance(
+              lastLatLng.lat,
+              lastLatLng.lng,
+              lat,
+              lng
+            );
+            const timeDiff = (now - lastTimestamp) / 1000; // giây
+
+            if (timeDiff > 0) {
+              speed = distance / timeDiff;
+            }
+          }
+
           const kmh = speed !== null ? (speed * 3.6).toFixed(0) : "--";
           document.getElementById("speed").innerText = `Tốc độ: ${kmh} km/h`;
 
-          // Nếu đã có marker, di chuyển marker đó; nếu chưa có thì tạo mới
+          lastLatLng = { lat, lng };
+          lastTimestamp = now;
+
+          // --- CẬP NHẬT BẢN ĐỒ ---
+          map.setView([lat, lng], 20);
+
           if (myLocationMarker) {
             myLocationMarker.setLatLng([lat, lng]);
           } else {
