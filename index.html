@@ -136,7 +136,7 @@
           map.setView([lat, lng], 20);
 
           const speed = position.coords.speed; // m/s
-          const kmh = speed !== null ? (speed * 3.6).toFixed(2) : "--";
+          const kmh = speed !== null ? (speed * 3.6).toFixed(0) : "--";
           document.getElementById("speed").innerText = `Tốc độ: ${kmh} km/h`;
 
           // Nếu đã có marker, di chuyển marker đó; nếu chưa có thì tạo mới
